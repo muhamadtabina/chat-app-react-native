@@ -15,17 +15,18 @@ interface UserDocument extends Document {
 const userSchema = new Schema<UserDocument>(
   {
     email: {
-      required: true,
+      required: [true, "Email required"],
       type: String,
       unique: [true, "Email already registered"],
+      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Email is invalid"],
     },
     name: {
-      required: true,
+      required: [true, "Username required"],
       type: String,
       unique: [true, "Username already registered"],
     },
     password: {
-      required: true,
+      required: [true, "Password required"],
       type: String,
       min: [6, "Password minimal 6 character"],
     },
