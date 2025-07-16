@@ -1,5 +1,5 @@
 import { Schema, Document, model } from "mongoose";
-import { genSalt, hash } from "bcrypt";
+import { genSalt, hash, compare } from "bcrypt";
 
 interface UserDocument extends Document {
   email: string;
@@ -12,7 +12,11 @@ interface UserDocument extends Document {
   };
 }
 
-const userSchema = new Schema<UserDocument>(
+interface Methods {
+  comparePassword(inputPassword: string): Promise<boolean>;
+}
+
+const userSchema = new Schema<UserDocument, {}, Methods>(
   {
     email: {
       required: [true, "Email required"],
@@ -51,6 +55,10 @@ userSchema.pre("save", async function (next) {
   }
   next();
 });
+
+userSchema.methods.comparePassword = async function (inputPassword) {
+  return await compare(inputPassword, this.password);
+};
 
 const User = model("User", userSchema);
 
